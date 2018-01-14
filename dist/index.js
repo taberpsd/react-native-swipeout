@@ -317,12 +317,13 @@ var Swipeout = (0, _createReactClass2.default)({
       var direction = this.state.openedRight ? 'right' : 'left';
       onClose(sectionID, rowID, direction);
     }
-    this._tweenContent('contentPos', 0);
+    //this._tweenContent('contentPos', 0);
     this._callOnClose();
     this.setState({
       openedRight: false,
       openedLeft: false,
-      swiping: false
+      swiping: false,
+      contentPos: 0
     });
   },
 
