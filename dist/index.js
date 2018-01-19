@@ -43,7 +43,7 @@ var SwipeoutBtn = (0, _createReactClass2.default)({
     color: _propTypes2.default.string,
     component: _propTypes2.default.node,
     onPress: _propTypes2.default.func,
-    text: _propTypes2.default.string,
+    text: _propTypes2.default.node,
     type: _propTypes2.default.string,
     underlayColor: _propTypes2.default.string
   },
@@ -181,7 +181,7 @@ var Swipeout = (0, _createReactClass2.default)({
   },
 
   componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-    if (nextProps.close) this._close();
+    if (nextProps.close) this._close(true);
     if (nextProps.openRight) this._openRight();
     if (nextProps.openLeft) this._openLeft();
   },
@@ -262,7 +262,7 @@ var Swipeout = (0, _createReactClass2.default)({
       } else if (openLeft && contentPos > 0 && posX > 0) {
         this._open(btnsLeftWidth, 'left');
       } else {
-        this._close();
+        this._close(true);
       }
     }
 
@@ -285,7 +285,7 @@ var Swipeout = (0, _createReactClass2.default)({
 
   //  close swipeout on button press
   _autoClose: function _autoClose(btn) {
-    if (this.state.autoClose) this._close();
+    if (this.state.autoClose) this._close(false);
     var onPress = btn.onPress;
     if (onPress) onPress();
   },
@@ -307,7 +307,7 @@ var Swipeout = (0, _createReactClass2.default)({
     });
   },
 
-  _close: function _close() {
+  _close: function _close(isAnimated) {
     var _props2 = this.props,
         sectionID = _props2.sectionID,
         rowID = _props2.rowID,
@@ -317,14 +317,23 @@ var Swipeout = (0, _createReactClass2.default)({
       var direction = this.state.openedRight ? 'right' : 'left';
       onClose(sectionID, rowID, direction);
     }
-    //this._tweenContent('contentPos', 0);
-    this._callOnClose();
-    this.setState({
-      openedRight: false,
-      openedLeft: false,
-      swiping: false,
-      contentPos: 0
-    });
+    if (isAnimated) {
+      this._tweenContent('contentPos', 0);
+      this._callOnClose();
+      this.setState({
+        openedRight: false,
+        openedLeft: false,
+        swiping: false
+      });
+    } else {
+      this._callOnClose();
+      this.setState({
+        openedRight: false,
+        openedLeft: false,
+        swiping: false,
+        contentPos: 0
+      });
+    }
   },
 
   _callOnClose: function _callOnClose() {
@@ -339,9 +348,11 @@ var Swipeout = (0, _createReactClass2.default)({
     var _this3 = this;
 
     this.refs.swipeoutContent.measure(function (ox, oy, width, height) {
+      var btnWidth = _this3.props.buttonWidth || width / 5;
+
       _this3.setState({
-        btnWidth: width / 5,
-        btnsRightWidth: _this3.props.right ? width / 5 * _this3.props.right.length : 0
+        btnWidth: btnWidth,
+        btnsRightWidth: _this3.props.right ? btnWidth * _this3.props.right.length : 0
       }, function () {
         _this3._tweenContent('contentPos', -_this3.state.btnsRightWidth);
         _this3._callOnOpen();
@@ -359,9 +370,11 @@ var Swipeout = (0, _createReactClass2.default)({
     var _this4 = this;
 
     this.refs.swipeoutContent.measure(function (ox, oy, width, height) {
+      var btnWidth = _this4.props.buttonWidth || width / 5;
+
       _this4.setState({
-        btnWidth: width / 5,
-        btnsLeftWidth: _this4.props.left ? width / 5 * _this4.props.left.length : 0
+        btnWidth: btnWidth,
+        btnsLeftWidth: _this4.props.left ? btnWidth * _this4.props.left.length : 0
       }, function () {
         _this4._tweenContent('contentPos', _this4.state.btnsLeftWidth);
         _this4._callOnOpen();

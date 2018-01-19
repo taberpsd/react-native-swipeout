@@ -155,7 +155,7 @@ const Swipeout = createReactClass({
   },
 
   componentWillReceiveProps: function(nextProps) {
-    if (nextProps.close) this._close();
+    if (nextProps.close) this._close(true);
     if (nextProps.openRight) this._openRight();
     if (nextProps.openLeft) this._openLeft();
   },
@@ -236,7 +236,7 @@ const Swipeout = createReactClass({
       } else if (openLeft && contentPos > 0 && posX > 0) {
         this._open(btnsLeftWidth, 'left');
       } else {
-        this._close();
+        this._close(true);
       }
     }
 
@@ -260,7 +260,7 @@ const Swipeout = createReactClass({
 
   //  close swipeout on button press
   _autoClose: function(btn) {
-    if (this.state.autoClose) this._close();
+    if (this.state.autoClose) this._close(false);
     var onPress = btn.onPress;
     if (onPress) onPress();
   },
@@ -278,19 +278,29 @@ const Swipeout = createReactClass({
     });
   },
 
-  _close: function() {
+  _close: function(isAnimated) {
     const { sectionID, rowID, onClose } = this.props;
     if (onClose && (this.state.openedLeft || this.state.openedRight)) {
       const direction = this.state.openedRight ? 'right' : 'left';
       onClose(sectionID, rowID, direction);
     }
-    this._tweenContent('contentPos', 0);
-    this._callOnClose();
-    this.setState({
-      openedRight: false,
-      openedLeft: false,
-      swiping: false,
-    });
+    if (isAnimated) {
+      this._tweenContent('contentPos', 0);
+      this._callOnClose();
+      this.setState({
+        openedRight: false,
+        openedLeft: false,
+        swiping: false,
+      });
+    } else {
+      this._callOnClose();
+      this.setState({
+        openedRight: false,
+        openedLeft: false,
+        swiping: false,
+        contentPos: 0
+      });
+    }
   },
 
   _callOnClose: function() {
